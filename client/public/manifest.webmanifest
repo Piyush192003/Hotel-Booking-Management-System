@@ -1,0 +1,17 @@
+{
+  "name": "Wanderlust — Hotel Booking",
+  "short_name": "Wanderlust",
+  "description": "Find and book the perfect hotel. Premium stays, honest prices, effortless bookings.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1d6fef",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
