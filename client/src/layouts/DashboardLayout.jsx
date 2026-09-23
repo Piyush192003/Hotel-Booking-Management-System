@@ -12,7 +12,7 @@ const NAV_BY_ROLE = {
     { to: '/dashboard/wishlist', label: 'Wishlist' },
     { to: '/dashboard/reviews', label: 'My reviews' },
     { to: '/dashboard/notifications', label: 'Notifications' },
-    { to: '/dashboard/profile', label: 'Profile' },
+    { to: '/dashboard/settings', label: 'Settings' },
   ],
   owner: [
     { to: '/owner', label: 'Overview', end: true },
@@ -21,7 +21,7 @@ const NAV_BY_ROLE = {
     { to: '/owner/bookings', label: 'Bookings' },
     { to: '/owner/revenue', label: 'Revenue' },
     { to: '/owner/reviews', label: 'Reviews' },
-    { to: '/dashboard/profile', label: 'Profile' },
+    { to: '/dashboard/settings', label: 'Settings' },
   ],
   admin: [
     { to: '/admin', label: 'Overview', end: true },
@@ -33,7 +33,7 @@ const NAV_BY_ROLE = {
     { to: '/admin/coupons', label: 'Coupons' },
     { to: '/admin/reports', label: 'Reports' },
     { to: '/admin/audit-logs', label: 'Audit logs' },
-    { to: '/dashboard/profile', label: 'Profile' },
+    { to: '/dashboard/settings', label: 'Settings' },
   ],
 };
 
@@ -42,7 +42,8 @@ const TITLES = [
   { match: /^\/dashboard\/wishlist/, title: 'Wishlist' },
   { match: /^\/dashboard\/reviews/, title: 'My reviews' },
   { match: /^\/dashboard\/notifications/, title: 'Notifications' },
-  { match: /^\/dashboard\/profile/, title: 'Profile & settings' },
+  { match: /^\/dashboard\/settings/, title: 'Settings' },
+  { match: /^\/dashboard\/profile/, title: 'Settings' },
   { match: /^\/dashboard/, title: 'Dashboard' },
   { match: /^\/owner\/properties\/new/, title: 'Add property' },
   { match: /^\/owner\/properties/, title: 'My properties' },

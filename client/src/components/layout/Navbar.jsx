@@ -42,7 +42,7 @@ export default function Navbar() {
     { to: '/dashboard/bookings', label: 'My bookings', Icon: CalendarRange },
     { to: '/dashboard/wishlist', label: 'Wishlist', Icon: Heart },
     { to: '/dashboard/notifications', label: 'Notifications', Icon: Bell },
-    { to: '/dashboard/profile', label: 'Profile & settings', Icon: Settings },
+    { to: '/dashboard/settings', label: 'Settings', Icon: Settings },
   ].filter((i) => i.to);
 
   return (

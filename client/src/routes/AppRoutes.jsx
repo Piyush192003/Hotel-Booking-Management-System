@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { ProtectedRoute, RoleRoute } from './ProtectedRoute';
@@ -21,7 +21,7 @@ const BookingDetail = lazy(() => import('../pages/dashboard/BookingDetail'));
 const Wishlist = lazy(() => import('../pages/dashboard/Wishlist'));
 const MyReviews = lazy(() => import('../pages/dashboard/MyReviews'));
 const Notifications = lazy(() => import('../pages/dashboard/Notifications'));
-const Profile = lazy(() => import('../pages/dashboard/Profile'));
+const Settings = lazy(() => import('../pages/dashboard/Settings'));
 
 const OwnerDashboard = lazy(() => import('../pages/owner/OwnerDashboard'));
 const OwnerProperties = lazy(() => import('../pages/owner/OwnerProperties'));
@@ -68,7 +68,8 @@ export default function AppRoutes() {
             <Route path="dashboard/wishlist" element={<Wishlist />} />
             <Route path="dashboard/reviews" element={<MyReviews />} />
             <Route path="dashboard/notifications" element={<Notifications />} />
-            <Route path="dashboard/profile" element={<Profile />} />
+            <Route path="dashboard/profile" element={<Navigate to="/dashboard/settings" replace />} />
+            <Route path="dashboard/settings" element={<Settings />} />
           </Route>
         </Route>
 

@@ -100,6 +100,23 @@ export async function apiPut(url, body) {
   return { data: res.data?.data, meta: res.data?.meta || {}, message: res.data?.message };
 }
 
+/**
+ * Downloads a blob (e.g. the data-export JSON) with a friendly filename.
+ * Returns the filename so callers can toast it.
+ */
+export async function apiDownload(url, filename) {
+  const res = await apiClient.get(url, { responseType: 'blob' });
+  const blobUrl = URL.createObjectURL(res.data);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+  return filename;
+}
+
 export async function apiDelete(url) {
   const res = await apiClient.delete(url);
   return { data: res.data?.data, meta: res.data?.meta || {}, message: res.data?.message };

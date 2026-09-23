@@ -12,9 +12,10 @@ const blacklist = new Set();
 const BLACKLIST_MAX = 5000;
 
 class TokenService {
+  /** `tv` (token version) lets us invalidate every session by bumping the user. */
   generateAccessToken(user) {
     const jti = crypto.randomUUID();
-    return jwt.sign({ role: user.role, jti }, config.jwt.accessSecret, {
+    return jwt.sign({ role: user.role, jti, tv: user.tokenVersion || 0 }, config.jwt.accessSecret, {
       subject: String(user._id),
       expiresIn: config.jwt.accessExpiresIn,
     });
@@ -22,7 +23,7 @@ class TokenService {
 
   generateRefreshToken(user) {
     const jti = crypto.randomUUID();
-    return jwt.sign({ role: user.role, jti }, config.jwt.refreshSecret, {
+    return jwt.sign({ role: user.role, jti, tv: user.tokenVersion || 0 }, config.jwt.refreshSecret, {
       subject: String(user._id),
       expiresIn: config.jwt.refreshExpiresIn,
     });

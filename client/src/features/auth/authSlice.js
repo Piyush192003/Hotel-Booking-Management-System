@@ -78,6 +78,40 @@ export const changePassword = createAsyncThunk(
   },
 );
 
+/**
+ * Settings → "Log out of all other devices". The server rotates the token
+ * version (invalidating every other session) and returns a fresh pair for
+ * this device, which we swap into localStorage.
+ */
+export const logoutOtherDevices = createAsyncThunk(
+  'auth/logoutOtherDevices',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await apiPost('/settings/logout-all', {});
+      return { user: data?.user || null, accessToken: data?.accessToken || null };
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, 'Could not log out other devices'));
+    }
+  },
+);
+
+/**
+ * Settings → "Delete account" (GDPR-style, password-confirmed). The response
+ * carries the anonymised user; callers dispatch `profileDeleted` + `logoutUser`
+ * to finish the sign-out flow.
+ */
+export const accountDeleted = createAsyncThunk(
+  'auth/deleteAccount',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await apiPost('/settings/account/delete', payload);
+      return data || {};
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, 'Account deletion failed'));
+    }
+  },
+);
+
 export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async (email, { rejectWithValue }) => {
@@ -142,6 +176,9 @@ const authSlice = createSlice({
     clearAuthError(state) {
       state.error = null;
       state.actionError = null;
+    },
+    setUser(state, action) {
+      if (action.payload !== undefined) state.user = action.payload;
     },
     clearDevCode(state) {
       state.devVerificationCode = null;
@@ -230,9 +267,29 @@ const authSlice = createSlice({
       .addCase(changePassword.rejected, (state, action) => {
         state.actionStatus = 'failed';
         state.actionError = action.payload;
+      })
+      .addCase(logoutOtherDevices.fulfilled, (state, action) => {
+        // Server bumped tokenVersion and issued a fresh pair — swap it in.
+        state.user = action.payload.user || state.user;
+        if (action.payload.accessToken) storeAccessToken(action.payload.accessToken);
+        state.actionStatus = 'succeeded';
+      })
+      .addCase(accountDeleted.pending, (state) => {
+        state.actionStatus = 'loading';
+        state.actionError = null;
+      })
+      .addCase(accountDeleted.fulfilled, (state, action) => {
+        state.user = action.payload.user || null;
+        state.status = 'guest';
+        state.actionStatus = 'succeeded';
+        clearAccessToken();
+      })
+      .addCase(accountDeleted.rejected, (state, action) => {
+        state.actionStatus = 'failed';
+        state.actionError = action.payload;
       });
   },
 });
 
-export const { clearAuthError, clearDevCode } = authSlice.actions;
+export const { clearAuthError, clearDevCode, setUser } = authSlice.actions;
 export default authSlice.reducer;

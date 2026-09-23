@@ -9,6 +9,7 @@ import reviewRoutes from './reviewRoutes.js';
 import wishlistRoutes from './wishlistRoutes.js';
 import couponRoutes from './couponRoutes.js';
 import notificationRoutes from './notificationRoutes.js';
+import settingsRoutes from './settingsRoutes.js';
 import ownerRoutes from './ownerRoutes.js';
 import adminRoutes from './adminRoutes.js';
 
@@ -28,6 +29,7 @@ router.use('/reviews', reviewRoutes);
 router.use('/wishlist', wishlistRoutes);
 router.use('/coupons', couponRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/settings', settingsRoutes);
 router.use('/owner', ownerRoutes);
 router.use('/admin', adminRoutes);
 

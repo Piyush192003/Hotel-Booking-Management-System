@@ -75,6 +75,10 @@ export const AUDIT_ACTIONS = [
   'coupon_updated',
   'coupon_deleted',
   'user_role_changed',
+  'settings_updated',
+  'sessions_revoked',
+  'account_deleted',
+  'owner_deactivated',
 ];
 
 export const PAYMENT_PROVIDERS = {

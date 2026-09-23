@@ -72,7 +72,11 @@ export const resendVerification = asyncHandler(async (req, res) => {
 });
 
 export const login = asyncHandler(async (req, res) => {
-  const { user, tokens } = await AuthService.login({ email: req.body.email, password: req.body.password });
+  const { user, tokens } = await AuthService.login({
+    email: req.body.email,
+    password: req.body.password,
+    userAgent: req.headers['user-agent'] || '',
+  });
   setAuthCookies(res, tokens);
   return ApiResponse.send(res, ApiResponse.ok({ user: user.toSafeJSON(), tokens: { accessToken: tokens.accessToken } }, 'Logged in successfully'));
 });

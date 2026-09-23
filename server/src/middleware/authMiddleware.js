@@ -26,10 +26,14 @@ export async function authenticateUser(req, res, next) {
       return next(ApiError.unauthorized('Session has expired, please log in again'));
     }
 
-    const user = await User.findById(payload.sub);
+    const user = await User.findById(payload.sub).select('+tokenVersion');
     if (!user) return next(ApiError.unauthorized('Account no longer exists'));
     if (user.isBlocked) {
       return next(ApiError.forbidden('Your account has been blocked. Contact support.'));
+    }
+    // "Log out of all devices" bumps tokenVersion — older tokens stop working.
+    if (Number(payload.tv ?? 0) !== Number(user.tokenVersion ?? 0)) {
+      return next(ApiError.unauthorized('You were signed out of this device. Please log in again.'));
     }
     req.user = user;
     req.tokenPayload = payload;

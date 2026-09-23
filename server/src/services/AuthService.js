@@ -63,8 +63,8 @@ class AuthService {
     return { ok: true, sent: true, ...devExtras };
   }
 
-  async login({ email, password }) {
-    const user = await User.findOne({ email }).select('+passwordHash');
+  async login({ email, password, userAgent = '' }) {
+    const user = await User.findOne({ email }).select('+passwordHash +tokenVersion');
     if (!user) throw ApiError.unauthorized('Incorrect email or password');
     if (user.isBlocked) throw ApiError.forbidden('Your account has been blocked. Contact support.');
     const ok = await user.comparePassword(password);
@@ -72,6 +72,8 @@ class AuthService {
     // Email verification is disabled for now — unverified accounts may log in.
 
     user.lastLoginAt = new Date();
+    // Stored only so Settings → Login security can show "this device".
+    if (userAgent) user.lastLoginUserAgent = String(userAgent).slice(0, 300);
     await user.save({ timestamps: false });
     return { user, tokens: this.issueTokens(user) };
   }
@@ -88,10 +90,26 @@ async refresh(refreshToken) {
     const payload = await tokenService.verifyRefreshToken(refreshToken).catch(() => {
       throw ApiError.unauthorized('Invalid or expired refresh token');
     });
-    const user = await User.findById(payload.sub);
+    const user = await User.findById(payload.sub).select('+tokenVersion');
     if (!user) throw ApiError.unauthorized('Account no longer exists');
     if (user.isBlocked) throw ApiError.forbidden('Your account has been blocked');
+    // Reject tokens from a previous session generation (logout-all / deletion).
+    if (Number(payload.tv ?? 0) !== Number(user.tokenVersion ?? 0)) {
+      throw ApiError.unauthorized('Session ended. Please log in again.');
+    }
     await tokenService.revoke('refresh', payload.jti);
+    return { user, tokens: this.issueTokens(user) };
+  }
+
+  /**
+   * Invalidates every existing session by bumping the user's token version,
+   * then issues a fresh token pair so the caller's current device stays signed in.
+   */
+  async logoutAllDevices(userId) {
+    const user = await User.findById(userId).select('+tokenVersion');
+    if (!user) throw ApiError.notFound('User not found');
+    user.tokenVersion = Number(user.tokenVersion || 0) + 1;
+    await user.save({ timestamps: false });
     return { user, tokens: this.issueTokens(user) };
   }
 
@@ -166,7 +184,9 @@ async refresh(refreshToken) {
   }
 
   async updateProfile(userId, updates) {
-    const allowed = ['name', 'phone', 'avatar', 'address', 'preferences'];
+    // Preferences are intentionally NOT writable here — they have their own
+    // role-aware endpoint (`PATCH /api/settings`) so nothing can be bypassed.
+    const allowed = ['name', 'phone', 'avatar', 'address'];
     const patch = {};
     for (const key of allowed) {
       if (updates[key] !== undefined) patch[key] = updates[key];

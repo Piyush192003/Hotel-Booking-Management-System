@@ -83,9 +83,9 @@ export default function DashboardHome() {
           <p className="font-display text-base font-bold text-ink-900">🔍 Find your next stay</p>
           <p className="mt-1 text-sm text-ink-500">Search thousands of hotels across India.</p>
         </Link>
-        <Link to="/dashboard/profile" className="card-base p-6 transition hover:shadow-float">
-          <p className="font-display text-base font-bold text-ink-900">⚙️ Profile & settings</p>
-          <p className="mt-1 text-sm text-ink-500">Update your details and preferences.</p>
+        <Link to="/dashboard/settings" className="card-base p-6 transition hover:shadow-float">
+          <p className="font-display text-base font-bold text-ink-900">⚙️ Settings & preferences</p>
+          <p className="mt-1 text-sm text-ink-500">Profile, password, currency and notifications.</p>
         </Link>
       </div>
     </div>

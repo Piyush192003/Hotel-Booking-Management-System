@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { Pencil, Trash2 } from 'lucide-react';
 import { apiDelete, apiGet, getApiErrorMessage } from '../../services/apiClient';
 import ReviewCard from '../../components/reviews/ReviewCard';
@@ -11,7 +10,6 @@ import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 
 export default function MyReviews() {
-  const { user } = useSelector((s) => s.auth);
   const [reviews, setReviews] = useState([]);
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState(null);
@@ -57,8 +55,6 @@ export default function MyReviews() {
       setDeletingBusy(false);
     }
   };
-
-  const displayName = (r) => r.userId?.name || user?.name || 'You';
 
   if (status === 'loading') return <Spinner label="Loading reviews" />;
   if (status === 'failed') return <p className="text-sm text-red-600">{error}</p>;
