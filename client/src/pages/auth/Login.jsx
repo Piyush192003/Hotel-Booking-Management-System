@@ -38,6 +38,26 @@ export default function Login() {
   const loading = isSubmitting || status === 'loading';
   const justCreated = Boolean(location.state?.created);
 
+  // One-click demo logins (seeded accounts)
+  const [quickLoading, setQuickLoading] = useState(null);
+  const demoLogin = async (role) => {
+    setFormError('');
+    setQuickLoading(role);
+    const creds =
+      role === 'owner'
+        ? { email: 'owner@wanderlust.dev', password: 'password123' }
+        : { email: 'guest@wanderlust.dev', password: 'password123' };
+    const result = await dispatch(loginUser(creds));
+    setQuickLoading(null);
+    if (result.meta.requestStatus === 'fulfilled') {
+      const userRole = result.payload?.user?.role;
+      const dest = userRole === 'owner' ? '/owner' : userRole === 'admin' ? '/admin' : '/dashboard';
+      navigate(dest, { replace: true });
+    } else {
+      setFormError(result.payload?.message || 'Demo login failed. Has the database been seeded?');
+    }
+  };
+
   return (
     <AuthLayout>
       <div className="w-full max-w-lg">
@@ -67,6 +87,36 @@ export default function Login() {
             <Input label="Password" type="password" autoComplete="current-password" placeholder="••••••••" error={errors.password?.message} {...register('password')} />
             <Button type="submit" className="w-full" disabled={loading} loading={loading}>Log in</Button>
           </form>
+
+          <div className="mt-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-sand-200" />
+            <span className="text-xs font-medium uppercase tracking-wider text-ink-400">or try a demo</span>
+            <span className="h-px flex-1 bg-sand-200" />
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={loading}
+              loading={quickLoading === 'guest'}
+              onClick={() => demoLogin('guest')}
+            >
+              👤 Login as Guest User
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={loading}
+              loading={quickLoading === 'owner'}
+              onClick={() => demoLogin('owner')}
+            >
+              🏨 Login as Guest Owner
+            </Button>
+          </div>
+          <p className="mt-2 text-center text-xs text-ink-400">
+            Instantly explore the customer dashboard or the owner's property manager (seeded demo accounts).
+          </p>
 
           <p className="mt-6 text-center text-sm text-ink-500">
             New to Wanderlust?{' '}
