@@ -43,6 +43,10 @@
   .label-base {
     @apply mb-1.5 block text-sm font-medium text-ink-700;
   }
+  /* Compact variant for dense forms (e.g. login) — must come after .input-base */
+  .input-compact {
+    @apply px-3 py-2;
+  }
   .card-base {
     @apply rounded-xl border border-ink-100 bg-white shadow-card;
   }

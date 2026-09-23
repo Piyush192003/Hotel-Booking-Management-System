@@ -65,7 +65,7 @@ export default function AuthLayout({ children }) {
       </aside>
 
       {/* Form panel */}
-      <main className="flex min-w-0 flex-1 items-center justify-center px-4 py-12 sm:px-8 lg:px-12">
+      <main className="flex min-w-0 flex-1 items-center justify-center px-4 py-6 sm:px-8 sm:py-8 lg:px-12">
         {children}
       </main>
     </div>
