@@ -64,11 +64,18 @@ class AuthService {
   }
 
   async login({ email, password, userAgent = '' }) {
-    const user = await User.findOne({ email }).select('+passwordHash +tokenVersion');
-    if (!user) throw ApiError.unauthorized('Incorrect email or password');
+    const normalizedEmail = String(email || '').toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail }).select('+passwordHash +tokenVersion');
+    if (!user) {
+      console.warn(`[auth] login failed — no account for "${normalizedEmail}"`);
+      throw ApiError.unauthorized('Incorrect email or password');
+    }
     if (user.isBlocked) throw ApiError.forbidden('Your account has been blocked. Contact support.');
     const ok = await user.comparePassword(password);
-    if (!ok) throw ApiError.unauthorized('Incorrect email or password');
+    if (!ok) {
+      console.warn(`[auth] login failed — wrong password for "${normalizedEmail}"`);
+      throw ApiError.unauthorized('Incorrect email or password');
+    }
     // Email verification is disabled for now — unverified accounts may log in.
 
     user.lastLoginAt = new Date();
