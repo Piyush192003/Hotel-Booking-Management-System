@@ -1,7 +1,7 @@
 import app from './app.js';
 import { connectDatabase, disconnectDatabase } from './config/db.js';
 import { config, isEmailConfigured } from './config/env.js';
-import { ensureDemoUsers } from './seed/ensureDemoUsers.js';
+import { ensureDemoContent } from './seed/ensureDemoUsers.js';
 import { startJobs } from './jobs/index.js';
 
 async function main() {
@@ -14,18 +14,19 @@ async function main() {
     process.exit(1);
   }
 
-  // Non-destructive demo-account bootstrap (fixes 401 on "Guest User / Guest
-  // Owner" one-click logins when the production DB was never seeded).
-  // Opt-out with SEED_DEMO_USERS=false. Only the 3 demo accounts are
-  // upserted — all other data is untouched. Enabled in ALL environments by
-  // default so a fresh production DB (e.g. MongoDB Atlas on Render) gets
-  // the demo logins without any manual seeding step.
-  if (String(process.env.SEED_DEMO_USERS ?? 'true').toLowerCase() !== 'false') {
+  // Non-destructive demo-content bootstrap (fixes empty live site + 401 on
+  // "Guest User / Guest Owner" one-click logins when the production DB was
+  // never seeded). Opt-out with SEED_DEMO_CONTENT=false (legacy
+  // SEED_DEMO_USERS=false also works). Only demo-owned docs (3 accounts +
+  // 12 demo-slug hotels + their rooms) are upserted — all other data untouched.
+  const seedFlag = process.env.SEED_DEMO_CONTENT ?? process.env.SEED_DEMO_USERS ?? 'true';
+  if (String(seedFlag).toLowerCase() !== 'false') {
     try {
-      const ensured = await ensureDemoUsers();
-      console.log(`[seed] demo accounts ready → ${ensured.join(', ')}`);
+      const { users, hotels } = await ensureDemoContent();
+      console.log(`[seed] demo accounts ready → ${users.join(', ')}`);
+      console.log(`[seed] demo hotels ready → ${hotels.created} created, ${hotels.refreshed} refreshed (${hotels.total} total)`);
     } catch (err) {
-      console.error('[seed] demo-account bootstrap failed (continuing anyway):', err.message);
+      console.error('[seed] demo-content bootstrap failed (continuing anyway):', err.message);
     }
   }
 
