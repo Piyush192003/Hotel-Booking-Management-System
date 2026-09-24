@@ -17,8 +17,10 @@ async function main() {
   // Non-destructive demo-account bootstrap (fixes 401 on "Guest User / Guest
   // Owner" one-click logins when the production DB was never seeded).
   // Opt-out with SEED_DEMO_USERS=false. Only the 3 demo accounts are
-  // upserted — all other data is untouched.
-  if (String(process.env.SEED_DEMO_USERS ?? (config.isProduction ? 'false' : 'true')).toLowerCase() !== 'false') {
+  // upserted — all other data is untouched. Enabled in ALL environments by
+  // default so a fresh production DB (e.g. MongoDB Atlas on Render) gets
+  // the demo logins without any manual seeding step.
+  if (String(process.env.SEED_DEMO_USERS ?? 'true').toLowerCase() !== 'false') {
     try {
       const ensured = await ensureDemoUsers();
       console.log(`[seed] demo accounts ready → ${ensured.join(', ')}`);
